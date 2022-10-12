@@ -334,13 +334,13 @@ impl Client {
             })
         }
     }
-    pub async fn quota(&self) -> Result<(u64, u64), Error> {
+    pub async fn quota(&self) -> Result<(i64, i64), Error> {
         let cmd_response = self.quota_rsp().await?;
         if cmd_response.len() > 0 {
             let x = &cmd_response[0];
             let quota_available = x.prop_stat.prop.quota_available_bytes.unwrap_or(0);
             let quota_used = x.prop_stat.prop.quota_used_bytes.unwrap_or(0);
-            Ok((quota_available as u64, quota_used as u64))
+            Ok((quota_available, quota_used))
         } else {
             Ok((0, 0))
         }
