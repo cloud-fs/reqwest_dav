@@ -338,11 +338,11 @@ impl Client {
         let cmd_response = self.quota_rsp().await?;
         if cmd_response.len() > 0 {
             let x = &cmd_response[0];
-            let quota_available = x.prop_stat.prop.quota_available_bytes.unwrap_or(0);
-            let quota_used = x.prop_stat.prop.quota_used_bytes.unwrap_or(0);
+            let quota_available = x.prop_stat.prop.quota_available_bytes.ok_or(error(Kind::Decode, message("quota_available_bytes not found")))?;
+            let quota_used = x.prop_stat.prop.quota_used_bytes.ok_or(error(Kind::Decode, message("quota_used_bytes not found")))?;
             Ok((quota_available, quota_used))
         } else {
-            Ok((0, 0))
+            Err(error(Kind::Decode, message("no valid response")))
         }
     }
 }
