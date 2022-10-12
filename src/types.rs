@@ -323,6 +323,29 @@ pub mod list_cmd {
         #[serde(rename = "getcontenttype")]
         pub content_type: Option<String>,
     }
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct QUotaMultiStatus {
+        #[serde(rename = "response")]
+        pub response: QuotaResponse,
+    }
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct QuotaResponse {
+        pub href: String,
+        #[serde(rename = "propstat")]
+        pub prop_stat: QuotaStat,
+    }
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct QuotaStat {
+        pub status: String,
+        pub prop: QuotaProp,
+    }
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct QuotaProp {
+        #[serde(rename = "quota-used-bytes")]
+        pub quota_used_bytes: i64,
+        #[serde(rename = "quota-available-bytes")]
+        pub quota_available_bytes: i64,
+    }
 }
 
 pub mod list_entities {
