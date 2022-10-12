@@ -290,6 +290,61 @@ impl Client {
         }
         Ok(entities)
     }
+    pub async fn quota_raw(&self) -> Result<Response, Error> {
+        let body = r#"<?xml version="1.0" encoding="utf-8" ?>
+                        <propfind xmlns="DAV:">
+                            <prop>
+                                <quota-available-bytes/>
+                                <quota-used-bytes/>
+                            </prop>
+                        </propfind>"#;
+        let depth = Depth::Number(0);
+        Ok(self
+            .start_request(Method::from_bytes(b"PROPFIND").unwrap(), "/")
+            .await?
+            .headers({
+                let mut map = HeaderMap::new();
+                map.insert(
+                    "depth",
+                    HeaderValue::from_str(&match depth {
+                        Depth::Number(value) => format!("{}", value),
+                        Depth::Infinity => "infinity".to_owned(),
+                    })?,
+                );
+                map
+            })
+            .body(body)
+            .send()
+            .await?)
+    }
+    pub async fn quota_rsp(&self) -> Result<Vec<ListResponse>, Error> {
+        let reqwest_response = self.quota_raw().await?;
+        if reqwest_response.status().as_u16() == 207 {
+            let response = reqwest_response.text().await?;
+            let mul: ListMultiStatus = serde_xml_rs::from_str(&response)?;
+            Ok(mul.responses)
+        } else {
+            Err(Error {
+                inner: Box::new(Inner {
+                    kind: Kind::Decode,
+                    source: Some(Box::new(Message {
+                        message: "list response code not 207".to_string(),
+                    })),
+                }),
+            })
+        }
+    }
+    pub async fn quota(&self) -> Result<(u64, u64), Error> {
+        let cmd_response = self.quota_rsp().await?;
+        if cmd_response.len() > 0 {
+            let x = &cmd_response[0];
+            let quota_available = x.prop_stat.prop.quota_available_bytes.unwrap_or(0);
+            let quota_used = x.prop_stat.prop.quota_used_bytes.unwrap_or(0);
+            Ok((quota_available as u64, quota_used as u64))
+        } else {
+            Ok((0, 0))
+        }
+    }
 }
 
 impl ClientBuilder {
