@@ -283,11 +283,7 @@ impl Client {
                         .prop
                         .content_length
                         .ok_or(error(Kind::Decode, message("content_length not found")))?,
-                    content_type: x
-                        .prop_stat
-                        .prop
-                        .content_type
-                        .ok_or(error(Kind::Decode, message("content_type not found")))?,
+                    content_type: x.prop_stat.prop.content_type,
                     tag: x.prop_stat.prop.tag,
                 })
             });

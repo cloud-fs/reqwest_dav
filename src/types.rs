@@ -350,7 +350,7 @@ pub mod list_entities {
         pub content_length: i64,
 
         #[serde(rename = "getcontenttype")]
-        pub content_type: String,
+        pub content_type: Option<String>,
 
         #[serde(rename = "getetag")]
         pub tag: Option<String>,
