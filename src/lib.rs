@@ -7,6 +7,7 @@ use digest_auth::{AuthContext, WwwAuthenticateHeader};
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::{Body, Method, RequestBuilder, Response};
 use tokio::sync::Mutex;
+use types::list_cmd::{QuotaMultiStatus, QuotaResponse};
 use url::Url;
 
 use crate::types::common::Dav2xx;
@@ -317,12 +318,12 @@ impl Client {
             .send()
             .await?)
     }
-    pub async fn quota_rsp(&self) -> Result<Vec<ListResponse>, Error> {
+    pub async fn quota_rsp(&self) -> Result<QuotaResponse, Error> {
         let reqwest_response = self.quota_raw().await?;
         if reqwest_response.status().as_u16() == 207 {
             let response = reqwest_response.text().await?;
-            let mul: ListMultiStatus = serde_xml_rs::from_str(&response)?;
-            Ok(mul.responses)
+            let mul: QuotaMultiStatus = serde_xml_rs::from_str(&response)?;
+            Ok(mul.response)
         } else {
             Err(Error {
                 inner: Box::new(Inner {
@@ -335,15 +336,10 @@ impl Client {
         }
     }
     pub async fn quota(&self) -> Result<(i64, i64), Error> {
-        let cmd_response = self.quota_rsp().await?;
-        if cmd_response.len() > 0 {
-            let x = &cmd_response[0];
-            let quota_available = x.prop_stat.prop.quota_available_bytes.ok_or(error(Kind::Decode, message("quota_available_bytes not found")))?;
-            let quota_used = x.prop_stat.prop.quota_used_bytes.ok_or(error(Kind::Decode, message("quota_used_bytes not found")))?;
-            Ok((quota_available, quota_used))
-        } else {
-            Err(error(Kind::Decode, message("no valid response")))
-        }
+        let x = self.quota_rsp().await?;
+        let quota_available = x.prop_stat.prop.quota_available_bytes;
+        let quota_used = x.prop_stat.prop.quota_used_bytes;
+        Ok((quota_available, quota_used))
     }
 }
 

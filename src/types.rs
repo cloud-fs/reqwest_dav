@@ -324,7 +324,7 @@ pub mod list_cmd {
         pub content_type: Option<String>,
     }
     #[derive(Debug, Clone, Serialize, Deserialize)]
-    pub struct QUotaMultiStatus {
+    pub struct QuotaMultiStatus {
         #[serde(rename = "response")]
         pub response: QuotaResponse,
     }
