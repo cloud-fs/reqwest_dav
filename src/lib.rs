@@ -176,7 +176,7 @@ impl Client {
         let base = Url::parse(&self.host)?;
         let mv_to = format!(
             "{}/{}",
-            base.path().trim_end_matches("/"),
+            base.as_str().trim_end_matches("/"),
             to.trim_start_matches("/")
         );
         Ok(self
