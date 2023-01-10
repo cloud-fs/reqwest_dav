@@ -13,7 +13,7 @@ use url::Url;
 
 use crate::types::common::Dav2xx;
 pub use crate::types::common::*;
-use crate::types::list_cmd::{ListMultiStatus, ListMultiStatusNew, ListResponse};
+use crate::types::list_cmd::{ListMultiStatusNew, ListResponse};
 use crate::types::list_entities::{ListEntity, ListFile, ListFolder};
 
 pub mod types;
@@ -261,10 +261,10 @@ impl Client {
                         prop: ListProp {
                             last_modified: NaiveDateTime::parse_from_str(&np.prop.last_modified.as_deref().unwrap(), "%a, %d %b %Y %H:%M:%S GMT").unwrap(),//serde_xml_rs::from_str::<NaiveDateTime>("sdf").unwrap(),//&np.prop.last_modified.as_deref().unwrap()).unwrap(),//np.prop.last_modified.unwrap(),
                             resource_type: np.prop.resource_type.unwrap(),
-                            quota_used_bytes: np.prop.quota_used_bytes,
-                            quota_available_bytes: np.prop.quota_available_bytes,
+                            quota_used_bytes: np.prop.quota_used_bytes.map(|x| x.parse::<i64>().unwrap_or(0)),
+                            quota_available_bytes: np.prop.quota_available_bytes.map(|x| x.parse::<i64>().unwrap_or(0)),
                             tag: np.prop.tag,
-                            content_length: np.prop.content_length,
+                            content_length: np.prop.content_length.map(|x| x.parse::<i64>().unwrap_or(0)),
                             content_type: np.prop.content_type,
                         },
                     },

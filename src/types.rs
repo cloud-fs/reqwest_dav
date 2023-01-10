@@ -1,8 +1,6 @@
 use chrono::NaiveDateTime;
 use serde::Serializer;
 
-use crate::types::list_cmd::ListMultiStatusNew;
-
 pub mod common {
     use std::fmt;
     use std::fmt::{Debug, Display, Formatter};
@@ -350,14 +348,14 @@ pub mod list_cmd {
         pub last_modified: Option<String>,
         #[serde(rename = "resourcetype")]
         pub resource_type: Option<ListResourceType>,
-        #[serde(rename = "quota-used-bytes1")]
-        pub quota_used_bytes: Option<i64>,
-        #[serde(rename = "quota-available-bytes1")]
-        pub quota_available_bytes: Option<i64>,
+        #[serde(rename = "quota-used-bytes")]
+        pub quota_used_bytes: Option<String>,
+        #[serde(rename = "quota-available-bytes")]
+        pub quota_available_bytes: Option<String>,
         #[serde(rename = "getetag")]
         pub tag: Option<String>,
         #[serde(rename = "getcontentlength")]
-        pub content_length: Option<i64>,
+        pub content_length: Option<String>,
         #[serde(rename = "getcontenttype")]
         pub content_type: Option<String>,
     }
@@ -459,50 +457,4 @@ where
             .to_string()
             .as_str(),
     )
-}
-#[test]
-fn test_deserialize() {
-    let s = r#"<?xml version="1.0"?>
-    <d:multistatus xmlns:d="DAV:"
-        xmlns:s="http://sabredav.org/ns"
-        xmlns:oc="http://owncloud.org/ns"
-        xmlns:nc="http://nextcloud.org/ns">
-        <d:response>
-            <d:href>/remote.php/dav/files/yutan/</d:href>
-            <d:propstat>
-                <d:prop>
-                    <d:getlastmodified>Tue, 10 Jan 2023 02:14:15 GMT</d:getlastmodified>
-                    <d:resourcetype>
-                        <d:collection/>
-                    </d:resourcetype>
-                    <d:quota-used-bytes>26995936137</d:quota-used-bytes>
-                    <d:quota-available-bytes>-3</d:quota-available-bytes>
-                    <d:getetag>&quot;84a6c207907dbd883893d0274dd17133&quot;</d:getetag>
-                </d:prop>
-                <d:status>HTTP/1.1 200 OK</d:status>
-            </d:propstat>
-        </d:response>
-        <d:response>
-            <d:href>/remote.php/dav/files/yutan/1.txt</d:href>
-            <d:propstat>
-                <d:prop>
-                    <d:getlastmodified>Wed, 18 Mar 2020 11:29:05 GMT</d:getlastmodified>
-                    <d:getcontentlength>3</d:getcontentlength>
-                    <d:resourcetype/>
-                    <d:getetag>&quot;d1d331b20e24ea28a5d459c055202d73&quot;</d:getetag>
-                    <d:getcontenttype>text/plain</d:getcontenttype>
-                </d:prop>
-                <d:status>HTTP/1.1 200 OK</d:status>
-            </d:propstat>
-            <d:propstat>
-                <d:prop>
-                    <d:quota-used-bytes/>
-                    <d:quota-available-bytes/>
-                </d:prop>
-                <d:status>HTTP/1.1 404 Not Found</d:status>
-            </d:propstat>
-        </d:response>
-    </d:multistatus>"#;
-    let mul = serde_xml_rs::from_str::<ListMultiStatusNew>(s);//serde_xml_rs::<ListMultiStatusNew>from_str(s);
-    println!("mul {:?}", mul);
 }
