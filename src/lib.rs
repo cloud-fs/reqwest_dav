@@ -202,21 +202,21 @@ impl Client {
     }
 
     pub async fn list_raw(&self, path: &str, depth: Depth) -> Result<Response, Error> {
-        // let body = r#"<?xml version="1.0" encoding="utf-8" ?>
-        //     <D:propfind xmlns:D="DAV:">
-        //         <D:allprop/>
-        //     </D:propfind>
-        // "#;
-        let body = r#"<?xml version="1.0"?>
-        <a:propfind xmlns:a="DAV:">
-            <prop>
-                <getlastmodified/>
-                <resourcetype/>
-                <getetag/>
-                <getcontenttype/>
-                <getcontentlength/>
-            </prop>
-        </a:propfind>"#;
+        let body = r#"<?xml version="1.0" encoding="utf-8" ?>
+            <D:propfind xmlns:D="DAV:">
+                <D:allprop/>
+            </D:propfind>
+        "#;
+        // let body = r#"<?xml version="1.0"?>
+        // <a:propfind xmlns:a="DAV:">
+        //     <prop>
+        //         <getlastmodified/>
+        //         <resourcetype/>
+        //         <getetag/>
+        //         <getcontenttype/>
+        //         <getcontentlength/>
+        //     </prop>
+        // </a:propfind>"#;
 
         Ok(self
             .start_request(Method::from_bytes(b"PROPFIND").unwrap(), path)
