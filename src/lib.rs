@@ -12,7 +12,7 @@ use url::Url;
 
 use crate::types::common::Dav2xx;
 pub use crate::types::common::*;
-use crate::types::list_cmd::{ListMultiStatus, ListResponse};
+use crate::types::list_cmd::{ListMultiStatus, ListMultiStatusNew, ListResponse};
 use crate::types::list_entities::{ListEntity, ListFile, ListFolder};
 
 pub mod types;
@@ -241,7 +241,8 @@ impl Client {
         let reqwest_response = self.list_raw(path, depth).await?;
         if reqwest_response.status().as_u16() == 207 {
             let response = reqwest_response.text().await?;
-            let mul: ListMultiStatus = serde_xml_rs::from_str(&response)?;
+            let mul: ListMultiStatusNew = serde_xml_rs::from_str(&response)?;
+            //let mul: ListMultiStatus = serde_xml_rs::from_str(&response)?;
             Ok(mul.responses)
         } else {
             Err(Error {

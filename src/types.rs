@@ -286,7 +286,17 @@ pub mod list_cmd {
         #[serde(rename = "propstat")]
         pub prop_stat: ListPropStat,
     }
-
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct ListMultiStatusNew {
+        #[serde(rename = "response")]
+        pub responses: Vec<ListResponseNew>,
+    }
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct ListResponseNew {
+        pub href: String,
+        #[serde(rename = "propstat")]
+        pub prop_stat: Vec<ListPropStat>,
+    }
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct ListPropStat {
         pub status: String,
