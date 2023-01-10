@@ -243,7 +243,13 @@ impl Client {
             let response = reqwest_response.text().await?;
             let mul: ListMultiStatusNew = serde_xml_rs::from_str(&response)?;
             //let mul: ListMultiStatus = serde_xml_rs::from_str(&response)?;
-            Ok(mul.responses[0])
+            let result = mul.responses.into_iter().map(|x|{
+                ListResponse {
+                    href: x.href.to_owned(),
+                    prop_stat: x.prop_stat[0].to_owned(),
+                }
+            }).collect::<Vec<_>>();
+            Ok(mul.responses)
         } else {
             Err(Error {
                 inner: Box::new(Inner {
