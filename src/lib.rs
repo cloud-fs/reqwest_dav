@@ -209,13 +209,13 @@ impl Client {
         // "#;
         let body = r#"<?xml version="1.0"?>
         <a:propfind xmlns:a="DAV:">
-        <a:prop><a:getlastmodified/></a:prop>
-        <a:prop><a:resourcetype/></a:prop>
-        <a:prop><a:quota-used-bytes/></a:prop>
-        <a:prop><a:quota-available-bytes/></a:prop>
-        <a:prop><a:getetag/></a:prop>
-        <a:prop><a:getcontenttype/></a:prop>
-        <a:prop><a:getcontentlength/></a:prop>
+            <prop>
+                <getlastmodified/>
+                <resourcetype/>
+                <getetag/>
+                <getcontenttype/>
+                <getcontentlength/>
+            </prop>
         </a:propfind>"#;
 
         Ok(self
