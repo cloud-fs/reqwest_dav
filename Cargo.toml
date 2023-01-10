@@ -10,7 +10,7 @@ repository = "https://github.com/niuhuan/reqwest_dav"
 digest_auth = "0.3"
 reqwest = "0.11"
 url = "2.3"
-tokio = { version = "1.22", features = ["rt-multi-thread", "macros", "fs", "sync", "time"] }
+tokio = { version = "1.24", features = ["rt-multi-thread", "macros", "fs", "sync", "time"] }
 http = "0.2"
 chrono = "0.4"
 serde = "1.0"
