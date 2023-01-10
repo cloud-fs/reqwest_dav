@@ -249,7 +249,8 @@ impl Client {
                     prop_stat: x.prop_stat[0].to_owned(),
                 }
             }).collect::<Vec<_>>();
-            Ok(mul.responses)
+            Ok(result)
+            //Ok(mul.responses)
         } else {
             Err(Error {
                 inner: Box::new(Inner {
