@@ -3,11 +3,12 @@ use std::fmt::Debug;
 use std::ops::Deref;
 use std::sync::Arc;
 
+use chrono::NaiveDateTime;
 use digest_auth::{AuthContext, WwwAuthenticateHeader};
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::{Body, Method, RequestBuilder, Response};
 use tokio::sync::Mutex;
-use types::list_cmd::{QuotaMultiStatus, QuotaResponse};
+use types::list_cmd::{QuotaMultiStatus, QuotaResponse, ListPropStat, ListProp};
 use url::Url;
 
 use crate::types::common::Dav2xx;
@@ -244,9 +245,29 @@ impl Client {
             let mul: ListMultiStatusNew = serde_xml_rs::from_str(&response)?;
             //let mul: ListMultiStatus = serde_xml_rs::from_str(&response)?;
             let result = mul.responses.into_iter().map(|x|{
+                // let np = x.prop_stat.iter().find(|x| x.status.contains("200")).ok_or(Error {
+                //     inner: Box::new(Inner {
+                //         kind: Kind::Decode,
+                //         source: Some(Box::new(Message {
+                //             message: "list response code not 207".to_string(),
+                //         })),
+                //     }),
+                // })?;
+                let np = x.prop_stat[0].to_owned();
                 ListResponse {
                     href: x.href.to_owned(),
-                    prop_stat: x.prop_stat[0].to_owned(),
+                    prop_stat: ListPropStat {
+                        status: np.status.to_owned(),
+                        prop: ListProp {
+                            last_modified: NaiveDateTime::parse_from_str(&np.prop.last_modified.as_deref().unwrap(), "%a, %d %b %Y %H:%M:%S GMT").unwrap(),//serde_xml_rs::from_str::<NaiveDateTime>("sdf").unwrap(),//&np.prop.last_modified.as_deref().unwrap()).unwrap(),//np.prop.last_modified.unwrap(),
+                            resource_type: np.prop.resource_type.unwrap(),
+                            quota_used_bytes: np.prop.quota_used_bytes,
+                            quota_available_bytes: np.prop.quota_available_bytes,
+                            tag: np.prop.tag,
+                            content_length: np.prop.content_length,
+                            content_type: np.prop.content_type,
+                        },
+                    },
                 }
             }).collect::<Vec<_>>();
             Ok(result)
